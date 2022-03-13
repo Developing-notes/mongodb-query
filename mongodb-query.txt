@@ -1,0 +1,87 @@
+
+mongo  
+> show dbs  
+admin    0.000GB
+config   0.000GB
+local    0.000GB
+
+create and read
+---------------
+> use task
+switched to db task
+> db.createCollection('task')
+{ "ok" : 1 }
+
+> show collections
+task
+
+> db.task.insertOne({_id:1,name:'pen',price:1.20})
+{ "acknowledged" : true, "insertedId" : 1 }
+
+> db.task.find().pretty()
+{ "_id" : 1, "name" : "pen", "price" : 1.2 }
+
+> db.createCollection('task1')
+{ "ok" : 1 }
+
+> show collections
+task
+task1
+
+> db.task1.insertMany([{_id:1,name:'pen',price:1.20,stock:32},{_id:2,name:'pencil',price:0.80,stock:12}])
+{ "acknowledged" : true, "insertedIds" : [ 1, 2 ] }
+
+{ "_id" : 3, "name" : "pencil", "price" : 0.8, "stock" : 12 }
+> db.task1.insert({_id:1,name:"pen",price:1.3,stock:13,overall:[{review:4,export:"chennai"}]})
+WriteResult({ "nInserted" : 1 })
+> db.task1.find().pretty()
+
+embedded or nested document:
+----------------------------
+{ "_id" : 3, "name" : "pencil", "price" : 0.8, "stock" : 12 }
+{
+        "_id" : 1,
+        "name" : "pen",
+        "price" : 1.3,
+        "stock" : 13,
+        "overall" : [
+                {
+                        "review" : 4,
+                        "export" : "chennai"
+                }
+        ]
+}
+
+
+> db.task1.find().pretty()
+{ "_id" : 1, "name" : "pen", "price" : 1.2, "stock" : 32 }
+{ "_id" : 2, "name" : "pencil", "price" : 0.8, "stock" : 12 }
+> db.task.find({name:'pencil'}).pretty()
+
+> db.task1.find({name:'pencil'}).pretty()
+{ "_id" : 2, "name" : "pencil", "price" : 0.8, "stock" : 12 }
+
+> db.task1.find({price:{$gt:1}}).pretty()
+{ "_id" : 1, "name" : "pen", "price" : 1.2, "stock" : 32 }
+
+> db.task1.find({_id:1},{name:1})
+{ "_id" : 1, "name" : "pen" }
+
+> db.task1.find({_id:1},{name:1,_id:0})
+{ "name" : "pen" }
+
+updatemethods
+-------------
+> db.task1.updateOne({_id:1},{$set:{collection:5}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+    
+> db.task1.find()
+{ "_id" : 1, "name" : "pen", "price" : 1.2, "stock" : 32, "collection" : 5 }
+{ "_id" : 2, "name" : "pencil", "price" : 0.8, "stock" : 12 }
+
+deletemethods
+-------------
+db.task1.deleteOne({_id:1})
+{ "acknowledged" : true, "deletedCount" : 1 }
+
+>
